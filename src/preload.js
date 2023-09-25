@@ -13,3 +13,6 @@ window.addEventListener('DOMContentLoaded', () => {
   h2.innerText = 'Bought to you by preload.js';
   document.body.appendChild(h2);
 });
+
+// TODO: Can you use iframe with linkedin and salesforce?
+// TODO: Control over browser?
