@@ -1,12 +1,4 @@
-const { app, BrowserWindow } = require('electron');
-
-const createWindowFromURL = (url) => {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-  });
-  win.loadURL(url);
-};
+const { app, BrowserWindow, contextBridge, ipcRenderer } = require('electron');
 
 window.addEventListener('DOMContentLoaded', () => {
   const h2 = document.createElement('h2');
@@ -14,5 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(h2);
 });
 
-// TODO: Can you use iframe with linkedin and salesforce?
-// TODO: Control over browser?
+contextBridge.exposeInMainWorld('electron', {
+  createEmbed: async (url) => ipcRenderer.invoke('createEmbed', url),
+  deleteEmbed: async () => ipcRenderer.invoke('deleteEmbed'),
+});

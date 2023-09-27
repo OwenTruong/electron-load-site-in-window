@@ -1,4 +1,4 @@
-const { app, BrowserWindow, BrowserView } = require('electron');
+const { app, BrowserWindow, BrowserView, ipcMain } = require('electron');
 const path = require('node:path');
 
 const createWindow = () => {
@@ -11,6 +11,7 @@ const createWindow = () => {
   });
 
   win.loadFile('public/index.html');
+  return win;
 };
 
 const createWindowFromURL = (url) => {
@@ -24,33 +25,33 @@ const createWindowFromURL = (url) => {
 
 const createViewFromURL = (win, url) => {
   const view = new BrowserView();
-  win.setBrowserView(view);
-  view.setBounds({
-    x: 0,
-    y: 0,
-    width: 300,
-    height: 300,
-  });
-  view.webContents.loadURL(url);
-};
-
-app.whenReady().then(() => {
-  // createWindowFromURL('https://login.salesforce.com/');
-
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-  });
-  const view = new BrowserView();
-  win.setBrowserView(view);
   view.setBounds({
     x: 400,
     y: 0,
     width: 300,
     height: 600,
   });
-  view.webContents.loadURL('https://www.linkedin.com/');
-  win.loadFile('public/index.html');
+  view.webContents.loadURL(url);
+  win.setBrowserView(view);
+  return view;
+};
+
+app.whenReady().then(() => {
+  // createWindowFromURL('https://login.salesforce.com/');
+
+  const win = createWindow();
+
+  // createViewFromURL(win, 'https://www.linkedin.com/');
+
+  ipcMain.handle('createEmbed', async (event, args) => {
+    const view = createViewFromURL(win, args);
+    return true;
+  });
+
+  ipcMain.handle('deleteEmbed', async (event) => {
+    win.setBrowserView(null);
+    return true;
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
